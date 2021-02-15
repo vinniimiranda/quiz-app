@@ -1,73 +1,210 @@
-import { Ionicons } from '@expo/vector-icons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { MaterialIcons as Icon } from '@expo/vector-icons';
+import { createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
+import { useIsFocused } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
-
+import { Dimensions, Text, View } from 'react-native'
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import TabOneScreen from '../screens/TabOneScreen';
-import TabTwoScreen from '../screens/TabTwoScreen';
-import { BottomTabParamList, TabOneParamList, TabTwoParamList } from '../types';
+import HomeScreen from '../screens/HomeScreen';
+import { BottomTabParamList } from '../types';
+import QuizScreen from '../screens/QuizScreen';
+import ResultsScreen from '../screens/ResultsScreen'
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
+const { width } = Dimensions.get('window')
+
 export default function BottomTabNavigator() {
   const colorScheme = useColorScheme();
-
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
-      tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
+      initialRouteName="Home"
+      tabBar={(props) => <BottomTabBar  {...props}
+        style={{
+          backgroundColor: '#fff',
+          display: 'flex',
+          borderTopColor: '#fff',
+          height: 70
+        }} />}
+    >
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneNavigator}
+        name="Home"
+        component={HomeNavigator}
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
+          tabBarButton: ({ onPress, }) => {
+            const isFocused = useIsFocused();
+            return <TouchableOpacity onPress={onPress} style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'center',
+              flex: 1,
+              paddingLeft: 10,
+              paddingRight: 10,
+              width: width / 3
+
+            }}>
+              <View style={{
+                backgroundColor: isFocused ? '#06d3f625' : 'transparent',
+                padding: 35,
+                paddingTop: 5,
+                paddingBottom: 5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 10,
+              }}>
+                <Icon name="home" color={isFocused ? '#06d3f6' : '#666'} size={25} />
+                <Text style={{
+                  color: isFocused ? '#06d3f6' : '#333',
+                  fontSize: 10,
+                  fontWeight: 'bold'
+                }}>Home</Text>
+              </View>
+            </TouchableOpacity>
+          }
         }}
       />
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoNavigator}
+        name="Notify"
+        component={NotifyNavigator}
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
+          tabBarButton: ({ onPress }) => {
+            const isFocused = useIsFocused();
+            return <TouchableOpacity onPress={onPress} style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'center',
+              flex: 1,
+              paddingLeft: 10,
+              paddingRight: 10,
+              width: width / 3
+            }}>
+              <View style={{
+                backgroundColor: isFocused ? '#06d3f625' : 'transparent',
+                padding: 25,
+                paddingTop: 5,
+                paddingBottom: 5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 10,
+              }}>
+                <Icon name="notifications" color={isFocused ? '#06d3f6' : '#666'} size={25} />
+                <Text style={{
+                  color: isFocused ? '#06d3f6' : '#666',
+
+                  fontSize: 10,
+                  fontWeight: 'bold'
+                }}>Notificações</Text>
+              </View>
+            </TouchableOpacity>
+          }
+        }}
+      />
+      <BottomTab.Screen
+        name="Settings"
+        component={SettingsNavigator}
+        options={{
+          tabBarVisible: true,
+          tabBarButton: ({ onPress }) => {
+            const isFocused = useIsFocused();
+            return <TouchableOpacity onPress={onPress} style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'center',
+              flex: 1,
+              paddingLeft: 12,
+              paddingRight: 10,
+              width: width / 3
+            }}>
+              <View style={{
+                backgroundColor: isFocused ? '#06d3f625' : 'transparent',
+                padding: 20,
+                paddingTop: 5,
+                paddingBottom: 5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 10,
+              }}>
+                <Icon name="settings" color={isFocused ? '#06d3f6' : '#666'} size={25} />
+                <Text style={{
+                  color: isFocused ? '#06d3f6' : '#666',
+
+                  fontSize: 10,
+                  fontWeight: 'bold'
+                }}>Configurações</Text>
+              </View>
+            </TouchableOpacity>
+          }
         }}
       />
     </BottomTab.Navigator>
   );
 }
 
-// You can explore the built-in icon families and icons on the web at:
-// https://icons.expo.fyi/
-function TabBarIcon(props: { name: React.ComponentProps<typeof Ionicons>['name']; color: string }) {
-  return <Ionicons size={30} style={{ marginBottom: -3 }} {...props} />;
-}
 
 // Each tab has its own navigation stack, you can read more about this pattern here:
 // https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
-const TabOneStack = createStackNavigator<TabOneParamList>();
+const HomeStack = createStackNavigator();
 
-function TabOneNavigator() {
+function HomeNavigator() {
   return (
-    <TabOneStack.Navigator>
-      <TabOneStack.Screen
-        name="TabOneScreen"
-        component={TabOneScreen}
-        options={{ headerTitle: 'Tab One Title' }}
+    <HomeStack.Navigator>
+      <HomeStack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
       />
-    </TabOneStack.Navigator>
+      <HomeStack.Screen
+        name="Quiz"
+        component={QuizScreen}
+        options={{ headerShown: false }}
+      />
+      <HomeStack.Screen
+        name="Results"
+        component={ResultsScreen}
+        options={{ headerShown: false }}
+      />
+    </HomeStack.Navigator>
   );
 }
 
-const TabTwoStack = createStackNavigator<TabTwoParamList>();
-
-function TabTwoNavigator() {
+const NotifyStack = createStackNavigator();
+const NotifyScreen = () => <View style={{ flex: 1, padding: 30 }}><Text style={{
+  color: '#333'
+}}>Notifications</Text></View>
+function NotifyNavigator() {
   return (
-    <TabTwoStack.Navigator>
-      <TabTwoStack.Screen
-        name="TabTwoScreen"
-        component={TabTwoScreen}
-        options={{ headerTitle: 'Tab Two Title' }}
+    <NotifyStack.Navigator>
+      <NotifyStack.Screen
+        name="Notify"
+        component={NotifyScreen}
+
+        options={{ headerShown: false, }}
       />
-    </TabTwoStack.Navigator>
+    </NotifyStack.Navigator>
+  );
+}
+
+
+const SettingsSTack = createStackNavigator()
+const SettingsScreen = () => <View style={{ flex: 1, padding: 30 }}><Text>Settings</Text></View>
+
+function SettingsNavigator() {
+  return (
+    <SettingsSTack.Navigator>
+      <SettingsSTack.Screen
+        name="Settings"
+        component={SettingsScreen}
+
+        options={{ headerShown: false, }}
+      />
+    </SettingsSTack.Navigator>
   );
 }
