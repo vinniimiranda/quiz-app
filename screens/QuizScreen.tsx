@@ -7,11 +7,17 @@ import useColorScheme from '../hooks/useColorScheme';
 import { useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
+import questions from '../mocks/questions';
 
 export default function QuizScreen({
   navigation, route
 }: StackScreenProps<RootStackParamList, 'Root'>) {
   const params = route.params as any
+  const q = questions.filter(({ category }) => category === params.name).filter((_, i) => i < 20)
+
+  const [current, setCurrent] = React.useState(0)
+
+
   React.useEffect(() => {
     const { name } = params
     const parent = navigation.dangerouslyGetParent();
@@ -23,7 +29,7 @@ export default function QuizScreen({
         tabBarVisible: true
       });
   }, []);
-  
+
   const { navigate } = useNavigation()
   const colorScheme = useColorScheme();
   const [selectedOption, setSelectedOption] = React.useState(0)
@@ -33,7 +39,13 @@ export default function QuizScreen({
   }
 
   const handleNext = () => {
-    navigate('Results')
+    
+    if (current === 19) {
+      navigate('Results')
+    }
+    else {
+      setCurrent(current + 1)
+    }
   }
 
   const options = [
@@ -49,21 +61,21 @@ export default function QuizScreen({
         <Text>
           {params.name} Quiz
       </Text>
-        <Text style={styles.quizTitle}>Question 06/20</Text>
+        <Text style={styles.quizTitle}>Question {current + 1}/{q.length}</Text>
         <View style={styles.progress}>
-          {[...Array(20).fill(0)].map((item, i) => <View
+          {q.map((item, i) => <View
             key={i}
-            style={[styles.dot, { backgroundColor: i < 6 ? '#3c9' : '#ccc', }]}></View>
+            style={[styles.dot, { backgroundColor: i < current ? '#3c9' : '#ccc', }]}></View>
           )}
         </View>
 
         <View style={styles.question}>
           <Text style={styles.questionText}>
-            Qual a função da API de Math que arredonda o valor para baixo?
+            {q[current].question}
           </Text>
         </View>
         <View style={styles.answers}>
-          {options.map((value, index) => (
+          {q[current].options.map(({ answer }, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => handleSelectOption(index)}
@@ -74,7 +86,7 @@ export default function QuizScreen({
                 style={{
                   color: selectedOption === index ? Colors[colorScheme].successColor : Colors[colorScheme].inactiveTextColor,
                   fontWeight: 'bold'
-                }}>{value}</Text>
+                }}>{answer}</Text>
               <View
                 style={[styles.check, {
                   borderWidth: selectedOption === index ? 0 : 1

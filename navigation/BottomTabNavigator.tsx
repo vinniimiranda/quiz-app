@@ -71,6 +71,7 @@ export default function BottomTabNavigator() {
         name="Notify"
         component={NotifyNavigator}
         options={{
+          tabBarBadge: 3,
           tabBarButton: ({ onPress }) => {
             const isFocused = useIsFocused();
             return <TouchableOpacity onPress={onPress} style={{
