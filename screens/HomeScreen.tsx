@@ -1,21 +1,26 @@
-import * as React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { Text, View } from '../components/Themed';
+//@ts-ignore
 import PlayAndWin from '../assets/images/play_and_win.png'
 import { useNavigation } from '@react-navigation/native';
-const topQuiz = [
-  { name: 'Javascript', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/1200px-Unofficial_JavaScript_logo_2.svg.png' },
-  { name: 'Typescript', image: 'https://miro.medium.com/max/816/1*mn6bOs7s6Qbao15PMNRyOA.png' },
-  { name: 'CSharp', image: 'https://pluralsight.imgix.net/paths/path-icons/csharp-e7b8fcd4ce.png' },
-  { name: 'Java', image: 'https://www.ifpe.edu.br/campus/palmares/noticias/curso-de-extensao-em-java/javalogo.png'},
-  { name: 'Python', image: 'https://camo.githubusercontent.com/888e388801f947dec7c3d843942c277af25fe2b1aed1821542c4e711f210312a/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f632f63332f507974686f6e2d6c6f676f2d6e6f746578742e7376672f37363870782d507974686f6e2d6c6f676f2d6e6f746578742e7376672e706e67' },
-  { name: 'HTML', image: 'https://mestresdaweb.com.br/wp-content/uploads/2020/05/600px-HTML5_Badge.svg.png' },
-]
+import API from '../services/api';
+import { useUser } from '../context/UserContext';
 
 const { height } = Dimensions.get('window')
 
 export default function HomeScreen() {
   const { navigate } = useNavigation()
+  const [quizzes, setQuizzes] = useState([])
+  const { user } = useUser()
+  useEffect(() => {
+    API.get('/categories').then(({ data }) => setQuizzes(data)).catch((e) =>
+      console.log(e.response.data))
+    return () => {
+
+    }
+  }, [])
+
   return (
     <View style={styles.container}>
       <View style={{
@@ -25,27 +30,26 @@ export default function HomeScreen() {
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
         zIndex: 1,
-
       }}>
         <View style={styles.title}>
           <Image
             source={{
-              uri: 'http://github.com/vinniimiranda.png'
+              uri: user?.avatar
             }}
             style={styles.avatar}
           />
           <Text style={styles.userName}>
-            Vinicius Miranda
+            {user?.name}
         </Text>
         </View>
       </View>
       <View style={{
-        backgroundColor: '#000',
-        height: height / 3.75,
+        backgroundColor: '#1d2544',
+        height: '40%',
         margin: 20,
         position: 'relative',
-        top: -60,
-        marginBottom: 0, 
+        top: '-15%',
+        marginBottom: 0,
         marginTop: 0,
         borderRadius: 10,
         zIndex: 2,
@@ -60,12 +64,12 @@ export default function HomeScreen() {
           borderRadius: 10,
         }} />
         <View style={{
-          backgroundColor: "#000",
+          backgroundColor: "#1d2544",
           width: "48%", marginLeft: '4%'
         }}>
           <Text style={{
             color: '#FFF',
-            fontWeight: 'bold',
+            fontFamily: 'Rubik-bold',
             fontSize: 25,
             textTransform: "uppercase"
           }}>
@@ -74,7 +78,8 @@ export default function HomeScreen() {
         </Text>
           <Text style={{
             color: '#999',
-            marginTop: 10
+            marginTop: 10,
+            fontFamily: 'Rubik'
           }}>
             As melhores perguntas para você testar seu conhecimento!
         </Text>
@@ -88,24 +93,38 @@ export default function HomeScreen() {
         paddingBottom: 10,
         // flex: 1,
       }}>
-        <Text style={styles.quizTitle}>Top Quiz Categories</Text>
+        <View style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingRight: 20,
+        }}>
+          <Text style={styles.quizTitle}>Top Quiz Categories</Text>
+          <TouchableOpacity style={{
+            backgroundColor: '#06d3f625',
+            padding: 5,
+            paddingRight: 15,
+            paddingLeft: 15,
+            borderRadius: 10
+          }}>
+            <Text style={{
+              color: '#06d3f6',
+              fontFamily: 'Rubik-bold'
+            }}>
+              View All
+            </Text>
+          </TouchableOpacity>
+        </View>
         <ScrollView horizontal={true} style={styles.quizList}>
-          {topQuiz.map(({ name, image }) => (
+          {quizzes.map(({ name, imageUrl }) => (
             <TouchableOpacity
               style={styles.quizCategory}
               key={name}
               onPress={() => {
                 navigate('Quiz', { name })
               }}>
-              <Image source={{ uri: image }} style={styles.quizImage} />
-              <Text>{name}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-        <ScrollView horizontal={true}  >
-          {topQuiz.reverse().map(({ name, image }) => (
-            <TouchableOpacity style={styles.quizCategory} key={name}>
-              <Image source={{ uri: image }} style={styles.quizImage} />
+              <Image source={{ uri: imageUrl }} style={styles.quizImage} />
               <Text>{name}</Text>
             </TouchableOpacity>
           ))}
@@ -125,6 +144,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 30,
+    fontFamily: 'Rubik',
     backgroundColor: '#2a2b31'
   },
   avatar: {
@@ -134,12 +154,12 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 20,
-    fontWeight: 'bold',
     marginLeft: 15,
-    color: '#fff'
+    color: '#fff',
+    fontFamily: 'Rubik'
   },
   quizTitle: {
-    fontWeight: 'bold',
+    fontFamily: 'Rubik',
     fontSize: 22,
     marginBottom: 10
   },
